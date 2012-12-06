@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+lib = File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'webspinne'
+
+# parameters
+uri         = ARGV[0] || 'http://www.google.de'
+max_follows = (ARGV[1] || 10).to_i
+
+# visit
+visit = Webspinne.visit uri, max_follows
+
+puts "=== FINISHED ==="
+
+# stats
+visit.index.tap do |i|
+  puts "links (total)       = #{i.size}"
+  puts "visited / unvisited = #{i.visited_size} / #{i.unvisited_size}" 
+  puts "onsite / offsite    = #{i.onsite_size} / #{i.offsite_size}"
+end
+
+# csv report
+report = Webspinne.csv_report(visit.index)
+report.to_file(visit.site.hostname + '.csv')
